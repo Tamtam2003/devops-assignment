@@ -1,40 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hello-chart.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "hello-chart.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+  name: {{ .Chart.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "hello-chart.name" . }}
+      app: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: {{ include "hello-chart.name" . }}
+        app: {{ .Chart.Name }}
     spec:
       containers:
-        - name: app
+        - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 8080
-          env:
-            - name: PROJECT_NAME
-              value: {{ .Chart.Name | quote }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            - containerPort: {{ .Values.service.targetPort }}
